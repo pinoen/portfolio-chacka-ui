@@ -30,7 +30,7 @@ const LandingSection = () => {
     },
     onSubmit: (values) => {
       // e.preventDefault()
-      submit("", values)
+      submit("https://example.com/contactme", values)
       console.log("hola")
     },
     validationSchema: Yup.object({

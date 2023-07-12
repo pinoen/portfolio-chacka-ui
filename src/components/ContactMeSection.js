@@ -25,20 +25,29 @@ const LandingSection = () => {
     initialValues: {
       firstName: "",
       email: "",
-      type: "",
+      type: "hireMe",
       comment: ""
     },
-    onSubmit: (e, values) => {
-      e.preventDefault()
-      submit(values.firstName)
+    onSubmit: (values) => {
+      // e.preventDefault()
+      submit("", values)
+      console.log("hola")
     },
     validationSchema: Yup.object({
       firstName: Yup.string().required("Required"),
-      email: Yup.string().email().required("Required"),
+      email: Yup.string().email("Invalid email address").required("Required"),
       type: Yup.string().required("Required"),
-      comment: Yup.string().required("Required")
+      comment: Yup.string().min(25, "Must be at least 25 characters").required("Required")
     }),
   });
+
+  useEffect(() => {
+    if (response) {
+      onOpen(response.type, response.message);
+      if (response.type === "success")
+        formik.resetForm();
+    }
+  }, [response]);
 
   return (
     <FullScreenSection
@@ -54,32 +63,31 @@ const LandingSection = () => {
         <Box p={6} rounded="md" w="100%">
           <form onSubmit={formik.handleSubmit}>
             <VStack spacing={4}>
-              <FormControl isInvalid={formik.touched}>
+              <FormControl isInvalid={formik.touched.firstName && formik.errors.firstName}>
                 <FormLabel htmlFor="firstName">Name</FormLabel>
                 <Input
                   id="firstName"
                   name="firstName"
-                  value={formik.values.firstName}
-                  onChange={formik.handleChange}
-                />
-                {formik.values.firstName === "" ? <FormErrorMessage>Required</FormErrorMessage> : null}
+                  {...formik.getFieldProps("firstName")}
 
+                />
+
+                <FormErrorMessage>{formik.errors.firstName}</FormErrorMessage>
               </FormControl>
-              <FormControl isInvalid={formik.touched}>
+              <FormControl isInvalid={formik.touched.email && formik.errors.email}>
                 <FormLabel htmlFor="email">Email Address</FormLabel>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
+                  {...formik.getFieldProps("email")}
                 />
-                {formik.values.email === "" ? <FormErrorMessage>Required</FormErrorMessage> : null}
+                <FormErrorMessage>{formik.errors.email}</FormErrorMessage>
 
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="type">Type of enquiry</FormLabel>
-                <Select id="type" name="type" value={formik.values.type} onChange={formik.handleChange}
+                <Select id="type" name="type" value={formik.values.type} {...formik.getFieldProps("email")}
                 >
                   <option value="hireMe">Freelance project proposal</option>
                   <option value="openSource">
@@ -88,7 +96,7 @@ const LandingSection = () => {
                   <option value="other">Other</option>
                 </Select>
               </FormControl>
-              <FormControl isInvalid={formik.touched}>
+              <FormControl isInvalid={formik.touched.comment && formik.errors.comment}>
                 <FormLabel htmlFor="comment">Your message</FormLabel>
                 <Textarea
                   id="comment"
@@ -98,11 +106,11 @@ const LandingSection = () => {
                   onChange={formik.handleChange}
 
                 />
-                {formik.values.comment === "" ? <FormErrorMessage>Required</FormErrorMessage> : null}
+                <FormErrorMessage>{formik.errors.comment}</FormErrorMessage>
 
               </FormControl>
-              <Button type="submit" colorScheme="purple" width="full">
-                {isLoading ? "Loading" : "Submit"}
+              <Button isLoading={isLoading} type="submit" colorScheme="purple" width="full">
+                Submit
               </Button>
             </VStack>
           </form>
